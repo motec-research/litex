@@ -67,6 +67,9 @@ class LiteXArgumentParser(argparse.ArgumentParser):
             self.set_platform(platform)
             self.add_target_group()
         self.add_logging_group()
+        if soc is not None:
+            if hasattr(soc, 'add_args') and callable(soc.add_args):
+                soc.add_args(self)
 
     def set_platform(self, platform):
         """ set platform. Check first if not already set
