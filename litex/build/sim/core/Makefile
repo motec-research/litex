@@ -46,6 +46,7 @@ sim: $(OBJS_SIM) | mkdir
 		$(SRCS_SIM_CPP) $(OBJS_SIM) \
 		--top-module sim \
 		$(if $(THREADS), --threads $(THREADS),) \
+		$(if $(VERILOG), --default-language 1364-2005 --no-timing,) \
 		-CFLAGS "$(CFLAGS) -I$(SRC_DIR)" \
 		-LDFLAGS "$(LDFLAGS)" \
 		--trace \
