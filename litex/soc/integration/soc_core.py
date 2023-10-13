@@ -313,13 +313,14 @@ def soc_core_argdict(args):
             continue
         # Handle specific with_xy case (--xy/--no_xy are exposed).
         if a in ["with_uart", "with_timer", "with_ctrl"]:
-            arg = getattr(args, a.replace("with_", ""), False)
+            r[a] = getattr(args, a.replace("with_", ""), False)
         # Regular cases.
         else:
-            arg = getattr(args, a, None)
-        # Fill Dict.
-        if arg is not None:
-            r[a] = arg
+            # Ensure 'None' is a supported arg: for example cpu_type=None
+            try:
+                r[a] = getattr(args, a)
+            except:
+                pass
     return r
 
 # SoCMini ---------------------------------------------------------------------------------------
