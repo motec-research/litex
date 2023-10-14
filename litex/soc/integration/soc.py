@@ -952,7 +952,7 @@ class SoC(LiteXModule, SoCCoreCompat):
             colorer("added", color="green")))
         self.add_module(name=name, module=SoCController(**kwargs))
 
-    def add_ram(self, name, origin, size, contents=[], mode="rwx"):
+    def add_ram(self, name, origin, size, contents=None, mode="rwx"):
         ram_cls = {
             "wishbone": wishbone.SRAM,
             "axi-lite": axi.AXILiteSRAM,
@@ -968,6 +968,9 @@ class SoC(LiteXModule, SoCCoreCompat):
             address_width = self.bus.address_width,
             bursting      = self.bus.bursting
         )
+        # deprecated: None now used for uninitialised memory
+        if contents == []:
+            contents = None
         ram     = ram_cls(size, bus=ram_bus, init=contents, read_only=("w" not in mode), name=name)
         self.bus.add_slave(name=name, slave=ram.bus, region=SoCRegion(origin=origin, size=size, mode=mode))
         self.check_if_exists(name)
@@ -976,10 +979,10 @@ class SoC(LiteXModule, SoCCoreCompat):
             colorer("added", color="green"),
             self.bus.regions[name]))
         self.add_module(name=name, module=ram)
-        if contents != []:
+        if contents:
             self.add_config(f"{name}_INIT", 1)
 
-    def add_rom(self, name, origin, size, contents=[], mode="rx"):
+    def add_rom(self, name, origin, size, contents=None, mode="rx"):
         self.add_ram(name, origin, size, contents, mode=mode)
 
     def init_rom(self, name, contents=[], auto_size=True):

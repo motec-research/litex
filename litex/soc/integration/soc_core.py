@@ -72,15 +72,15 @@ class SoCCore(LiteXSoC):
         # ROM parameters
         integrated_rom_size      = 0,
         integrated_rom_mode      = "rx",
-        integrated_rom_init      = [],
+        integrated_rom_init      = None,
 
         # SRAM parameters
         integrated_sram_size     = 0x2000,
-        integrated_sram_init     = [],
+        integrated_sram_init     = None,
 
         # MAIN_RAM parameters
         integrated_main_ram_size = 0,
-        integrated_main_ram_init = [],
+        integrated_main_ram_init = None,
 
         # CSR parameters
         csr_data_width           = 32,
@@ -157,10 +157,10 @@ class SoCCore(LiteXSoC):
 
         # Disable ROM when no CPU/hard-CPU.
         if cpu_type in [None, "zynq7000", "zynqmp", "eos_s3"]:
-            integrated_rom_init = []
+            integrated_rom_init = None
             integrated_rom_size = 0
         self.integrated_rom_size        = integrated_rom_size
-        self.integrated_rom_initialized = integrated_rom_init != []
+        self.integrated_rom_initialized = integrated_rom_init is not None
 
         # SRAM.
         self.integrated_sram_size = integrated_sram_size
