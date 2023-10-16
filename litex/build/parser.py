@@ -49,6 +49,9 @@ class LiteXArgumentParser(argparse.ArgumentParser):
         ==========
         platform: GenericPlatform subclass
             targeted platform
+        soc: SoCCore subclass
+            target soc.
+            Parser default 'ident' for SoCCore is set to 'description' (if supplied)
         kwargs: dict
             all arguments passed to argparse.ArgumentParser CTOR
         """
@@ -68,6 +71,9 @@ class LiteXArgumentParser(argparse.ArgumentParser):
             self.add_target_group()
         self.add_logging_group()
         if soc is not None:
+            description = kwargs.get("description", None)
+            if description:
+                self.set_defaults(ident=description)
             if hasattr(soc, 'add_args') and callable(soc.add_args):
                 soc.add_args(self)
 
