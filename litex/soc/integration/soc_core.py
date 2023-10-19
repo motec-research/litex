@@ -324,6 +324,11 @@ def soc_core_argdict(args):
                     # deprecated: target may be setting ident directly to SoCCore(ident=...)
                     # which conficts with --ident, so don't set r[a] in this case
                     print("deprecated: use parser.set_defaults(ident=...) not SocCore.__init__(ident=...)", file=sys.stderr)
+                elif arg is None and a == "integrated_main_ram_size":
+                    # deprecated: for targets with this pattern to detect dram:
+                    # (kwargs.get("integrated_main_ram_size", 0) == 0)
+                    # change to: not kwargs.get("integrated_main_ram_size", None)
+                    r[a] = 0
                 else:
                     # normal operation
                     r[a] = arg
