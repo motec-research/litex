@@ -125,7 +125,13 @@ class LiteXArgumentParser(argparse.ArgumentParser):
         kwargs: dict
             couple argument name / default value
         """
-        self._args_default.update(kwargs)
+        for key, value in kwargs.items():
+            # fixup for targets that still use previous arg names
+            if key.startswith("no_"):
+                print(f"deprecated: set_defaults({key}=...) use set_defaults({key[3:]}=...)", file=sys.stderr)
+                self._args_default[key[3:]] = not value
+            else:
+                self._args_default[key] = value
 
     @property
     def builder_argdict(self):
