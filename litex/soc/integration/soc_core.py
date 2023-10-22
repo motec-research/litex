@@ -318,7 +318,15 @@ def soc_core_argdict(args):
         else:
             # Ensure 'None' is a supported arg: for example cpu_type=None
             try:
-                r[a] = getattr(args, a)
+                arg = getattr(args, a)
+                # deprecated: compatibility workarounds for 'None' defaults
+                if arg is None and a == "ident":
+                    # deprecated: target may be setting ident directly to SoCCore(ident=...)
+                    # which conficts with --ident, so don't set r[a] in this case
+                    print("deprecated: use parser.set_defaults(ident=...) not SocCore.__init__(ident=...)", file=sys.stderr)
+                else:
+                    # normal operation
+                    r[a] = arg
             except:
                 pass
     return r
