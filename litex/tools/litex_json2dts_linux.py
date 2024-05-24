@@ -14,6 +14,7 @@ import json
 import argparse
 
 from litex.gen.common import KILOBYTE, MEGABYTE
+from litex.tools.litex_json2dts_zephyr import dts_reg, dts_reg_names, indent_all
 
 def csr_base_size(d: dict, name: str) -> int:
     """Calculate size in bytes of csr_base `name` from the contents of d["csr_registers"]."""
@@ -516,6 +517,44 @@ def generate_dts(d, initrd_start=None, initrd_size=None, initrd=None, root_devic
 """.format(
     usb_ohci_mem_base  = d["memories"]["usb_ohci_ctrl"]["base"],
     usb_ohci_interrupt = "" if polling else "interrupts = <{}>;".format(16)) # FIXME
+
+    # GENERIC ----------------------------------------------------------------------------
+    for name in [name for name in d["constants"].keys() if name.endswith("_of_compatible")]:
+        name = name.removesuffix("_of_compatible")
+
+        of_constants = ""
+        for constant, value in d["constants"].items():
+            prefix = name + "_of_"
+            if not constant.startswith(prefix):
+                continue
+            constant = constant.removeprefix(prefix)
+            if constant == "compatible":
+                of_prefix = f'compatible = "{value}";\n'
+                peripheral = value.split(",")[-1]
+            else:
+                of_value = f'"{value}"' if isinstance(value, str) else f"<{value}>"
+                # TODO: some dts contant names are invalid for c #defined constants
+                of_constants += f"{constant} = {of_value};\n"
+        of_constants += dts_interrupt(d, name)
+        of_constants += f"clocks = <&{soc_sys_clk(name)}>;\n"
+        of_constants += 'status = "okay";\n'
+
+        reg = csr_regions(d, name) + mem_regions(d, name)
+        if reg == []:
+            raise ValueError(f"no reg for {name}")
+        of_prefix += dts_reg(reg, levels=0) + dts_reg_names(reg, levels=0)
+        of_constants = indent_all(of_prefix + of_constants, levels=4)
+
+        dts += """
+            {name}: {peripheral}@{base:x} {{
+{of_constants}
+            }};
+""".format(
+            name=name,
+            peripheral=peripheral,
+            of_constants=of_constants,
+            base=reg[0]["addr"],
+        )
 
     # SPI Flash ------------------------------------------------------------------------------------
 
