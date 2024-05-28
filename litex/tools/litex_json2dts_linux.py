@@ -531,10 +531,10 @@ def generate_dts(d, initrd_start=None, initrd_size=None, initrd=None, root_devic
             if constant == "compatible":
                 of_prefix = f'compatible = "{value}";\n'
                 peripheral = value.split(",")[-1]
+            elif constant == "constants":
+                of_constants += value
             else:
-                of_value = f'"{value}"' if isinstance(value, str) else f"<{value}>"
-                # TODO: some dts contant names are invalid for c #defined constants
-                of_constants += f"{constant} = {of_value};\n"
+                raise ValueError(f"unexpected constant {name}_of_{constant}")
         of_constants += dts_interrupt(d, name)
         of_constants += f"clocks = <&{soc_sys_clk(name)}>;\n"
         of_constants += 'status = "okay";\n'
