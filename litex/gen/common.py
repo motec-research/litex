@@ -43,3 +43,15 @@ def reverse_bytes(s):
     n = (len(s) + 7)//8
     return Cat(*[s[i*8:min((i + 1)*8, len(s))]
         for i in reversed(range(n))])
+
+
+# DTS  ---------------------------------------------------------------------------------------------
+
+
+def dts_constant(name: str, value: int | str = None) -> str:
+    """Returns a formatted dts string for the constant 'name'"""
+    if value is None:
+        return f"{name};\n"
+    else:
+        of_value = f'"{value}"' if isinstance(value, str) else f"<{value}>"
+        return f"{name} = {of_value};\n"

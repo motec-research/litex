@@ -15,6 +15,7 @@ import argparse
 
 from litex.gen.common import KILOBYTE, MEGABYTE
 from litex.tools.litex_json2dts_zephyr import dts_reg, dts_reg_names, indent_all
+from litex.gen import dts_constant
 
 def csr_base_size(d: dict, name: str) -> int:
     """Calculate size in bytes of csr_base `name` from the contents of d["csr_registers"]."""
@@ -529,7 +530,7 @@ def generate_dts(d, initrd_start=None, initrd_size=None, initrd=None, root_devic
                 continue
             constant = constant.removeprefix(prefix)
             if constant == "compatible":
-                of_prefix = f'compatible = "{value}";\n'
+                of_prefix = dts_constant("compatible", value)
                 peripheral = value.split(",")[-1]
             elif constant == "constants":
                 of_constants += value
