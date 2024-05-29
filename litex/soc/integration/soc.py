@@ -1009,6 +1009,13 @@ class SoC(LiteXModule, SoCCoreCompat):
         name = "CONFIG_" + name
         self.add_constant(name, value, check_duplicate=check_duplicate)
 
+    def add_core_dts(self, name: str, compatible: str, constants: str = None) -> None:
+        """Adds device tree information to generate entries for a core / module."""
+        prefix = name + "_of_"
+        self.add_constant(prefix + "compatible", compatible)
+        if constants:
+            self.add_constant(prefix + "constants", constants)
+
     def check_bios_requirements(self):
         # Check for required Peripherals.
         for periph in [ "timer0"]:
