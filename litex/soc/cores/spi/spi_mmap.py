@@ -642,6 +642,8 @@ class SPIEngine(LiteXModule):
 # SPIMMAP ------------------------------------------------------------------------------------------
 
 class SPIMMAP(LiteXModule):
+    dts_compatible = "litex,spi_mmap"
+
     def __init__(self, pads, data_width, sys_clk_freq,
         tx_origin = 0x0000_0000,
         rx_origin = 0x0000_0000,
