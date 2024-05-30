@@ -1307,6 +1307,7 @@ class SoC(LiteXModule, SoCCoreCompat):
         self.add_module(name=name, module=Timer())
         if self.irq.enabled:
             self.irq.add(name, use_loc_if_exists=True)
+        self.add_core_dts(name, compatible=Timer.dts_compatible)
 
     # SoC finalization -----------------------------------------------------------------------------
     def finalize(self):
