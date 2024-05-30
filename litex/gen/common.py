@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 from migen import *
+from typing import Union, List
 
 # Coloring Helpers ---------------------------------------------------------------------------------
 
@@ -48,10 +49,21 @@ def reverse_bytes(s):
 # DTS  ---------------------------------------------------------------------------------------------
 
 
-def dts_constant(name: str, value: int | str = None) -> str:
-    """Returns a formatted dts string for the constant 'name'"""
+def dts_constant(name: str, value: Union[int, str, List[int], List[str]] = None) -> str:
+    """Returns a formatted dts string for the constant 'name'
+
+    value can be None (default), int, str or a list of int or str.
+    """
     if value is None:
         return f"{name};\n"
+    elif isinstance(value, list):
+        if all(isinstance(v, int) for v in value):
+            of_value = "<" + " ".join(f"{v}" for v in value) + ">"
+        elif all(isinstance(v, str) for v in value):
+            of_value = ", ".join(f'"{v}"' for v in value)
+        else:
+            raise ValueError("All elements in the list must be of the same type (either all int or all str)")
+        return f"{name} = {of_value};\n"
     else:
         of_value = f'"{value}"' if isinstance(value, str) else f"<{value}>"
         return f"{name} = {of_value};\n"
