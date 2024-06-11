@@ -539,6 +539,8 @@ def generate_dts(d, initrd_start=None, initrd_size=None, initrd=None, root_devic
         of_constants += dts_interrupt(d, name)
         of_constants += f"clocks = <&{soc_sys_clk(name)}>;\n"
         of_constants += 'status = "okay";\n'
+        if "spi" in peripheral:
+            peripheral = "spi"
 
         reg = csr_regions(d, name) + mem_regions(d, name)
         if reg == []:
