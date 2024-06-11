@@ -7,7 +7,7 @@
 
 from migen import *
 
-from litex.gen import dts_constant, LiteXModule
+from litex.gen import dts_property, LiteXModule
 from litex.gen.genlib.misc import WaitTimer
 
 from litex.soc.interconnect.csr import *
@@ -643,8 +643,8 @@ class SPIEngine(LiteXModule):
 
 class SPIMMAP(LiteXModule):
     dts_compatible = "litex,spi_mmap"
-    dts_constants = dts_constant("#address-cells", 1)
-    dts_constants += dts_constant("#size-cells", 0)
+    dts_properties = dts_property("#address-cells", 1)
+    dts_properties += dts_property("#size-cells", 0)
 
     def __init__(self, pads, data_width, sys_clk_freq,
         tx_origin = 0x0000_0000,
@@ -655,9 +655,9 @@ class SPIMMAP(LiteXModule):
         nslots = len(pads.cs_n)
         assert nslots <= _nslots_max
 
-        self.dts_constants += dts_constant("tx-fifo-depth", tx_fifo_depth)
-        self.dts_constants += dts_constant("rx-fifo-depth", rx_fifo_depth)
-        self.dts_constants += dts_constant("num-cs", nslots)
+        self.dts_properties += dts_property("tx-fifo-depth", tx_fifo_depth)
+        self.dts_properties += dts_property("rx-fifo-depth", rx_fifo_depth)
+        self.dts_properties += dts_property("num-cs", nslots)
 
         # Ctrl (Control/Status/IRQ) ----------------------------------------------------------------
 

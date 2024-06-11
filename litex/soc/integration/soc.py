@@ -1009,12 +1009,12 @@ class SoC(LiteXModule, SoCCoreCompat):
         name = "CONFIG_" + name
         self.add_constant(name, value, check_duplicate=check_duplicate)
 
-    def add_core_dts(self, name: str, compatible: str, constants: str = None) -> None:
+    def add_dts_node(self, name: str, compatible: str, properties: str = None) -> None:
         """Adds device tree information to generate entries for a core / module."""
-        prefix = name + "_of_"
+        prefix = name + "_dts_"
         self.add_constant(prefix + "compatible", compatible)
-        if constants:
-            self.add_constant(prefix + "constants", constants)
+        if properties:
+            self.add_constant(prefix + "properties", properties)
 
     def check_bios_requirements(self):
         # Check for required Peripherals.
@@ -1307,7 +1307,7 @@ class SoC(LiteXModule, SoCCoreCompat):
         self.add_module(name=name, module=Timer())
         if self.irq.enabled:
             self.irq.add(name, use_loc_if_exists=True)
-        self.add_core_dts(name, compatible=Timer.dts_compatible)
+        self.add_dts_node(name, compatible=Timer.dts_compatible)
 
     # SoC finalization -----------------------------------------------------------------------------
     def finalize(self):

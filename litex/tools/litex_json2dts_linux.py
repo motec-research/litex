@@ -15,7 +15,7 @@ import argparse
 
 from litex.gen.common import KILOBYTE, MEGABYTE
 from litex.tools.litex_json2dts_zephyr import dts_reg, dts_reg_names, indent_all
-from litex.gen import dts_constant
+from litex.gen import dts_property
 
 def csr_base_size(d: dict, name: str) -> int:
     """Calculate size in bytes of csr_base `name` from the contents of d["csr_registers"]."""
@@ -519,43 +519,43 @@ def generate_dts(d, initrd_start=None, initrd_size=None, initrd=None, root_devic
     usb_ohci_mem_base  = d["memories"]["usb_ohci_ctrl"]["base"],
     usb_ohci_interrupt = "" if polling else "interrupts = <{}>;".format(16)) # FIXME
 
-    # GENERIC ----------------------------------------------------------------------------
-    for name in [name for name in d["constants"].keys() if name.endswith("_of_compatible")]:
-        name = name.removesuffix("_of_compatible")
+    # GENERIC device mode ---------------------------------------------------------------------------
+    for name in [name for name in d["constants"].keys() if name.endswith("_dts_compatible")]:
+        name = name.removesuffix("_dts_compatible")
 
-        of_constants = ""
+        dts_properties = ""
         for constant, value in d["constants"].items():
-            prefix = name + "_of_"
+            prefix = name + "_dts_"
             if not constant.startswith(prefix):
                 continue
             constant = constant.removeprefix(prefix)
             if constant == "compatible":
-                of_prefix = dts_constant("compatible", value)
+                dts_prefix = dts_property("compatible", value)
                 peripheral = value.split(",")[-1]
-            elif constant == "constants":
-                of_constants += value
+            elif constant == "properties":
+                dts_properties += value
             else:
-                raise ValueError(f"unexpected constant {name}_of_{constant}")
-        of_constants += dts_interrupt(d, name)
-        of_constants += f"clocks = <&{soc_sys_clk(name)}>;\n"
-        of_constants += 'status = "okay";\n'
+                raise ValueError(f"unexpected constant {name}_dts_{constant}")
+        dts_properties += dts_interrupt(d, name)
+        dts_properties += f"clocks = <&{soc_sys_clk(name)}>;\n"
+        dts_properties += 'status = "okay";\n'
         if "spi" in peripheral:
             peripheral = "spi"
 
         reg = csr_regions(d, name) + mem_regions(d, name)
         if reg == []:
             raise ValueError(f"no reg for {name}")
-        of_prefix += dts_reg(reg, levels=0) + dts_reg_names(reg, levels=0)
-        of_constants = indent_all(of_prefix + of_constants, levels=4)
+        dts_prefix += dts_reg(reg, levels=0) + dts_reg_names(reg, levels=0)
+        dts_properties = indent_all(dts_prefix + dts_properties, levels=4)
 
         dts += """
             {name}: {peripheral}@{base:x} {{
-{of_constants}
+{dts_properties}
             }};
 """.format(
             name=name,
             peripheral=peripheral,
-            of_constants=of_constants,
+            dts_properties=dts_properties,
             base=reg[0]["addr"],
         )
 

@@ -214,8 +214,8 @@ class Builder:
         self.soc.constants.update(  self._get_json_constants())
         self.soc.csr_regions.update(self._get_json_csr_regions())
 
-        # exclude dts-specific constants ("_OF_" in name)
-        filtered_constants = {k: v for k, v in self.soc.constants.items() if "_OF_" not in k}
+        # exclude Devicetree syntax specific constants ("_DTS_" in name)
+        filtered_constants = {k: v for k, v in self.soc.constants.items() if "_DTS_" not in k}
 
         # Generate BIOS files when the SoC uses it.
         if with_bios:
@@ -285,8 +285,8 @@ class Builder:
 
         # CSV Export.
         if self.csr_csv is not None:
-            # exclude dts-specific constants ("_OF_" in name)
-            filtered_constants = {k: v for k, v in self.soc.constants.items() if "_OF_" not in k}
+            # exclude dts-specific constants ("_DTS_" in name)
+            filtered_constants = {k: v for k, v in self.soc.constants.items() if "_DTS_" not in k}
             csr_csv_contents = export.get_csr_csv(
                 csr_regions = self.soc.csr_regions,
                 constants   = filtered_constants,
