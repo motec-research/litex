@@ -523,6 +523,8 @@ def get_csr_json(csr_regions={}, constants={}, mem_regions={}):
             for csr in region.obj:
                 _size = (csr.size + region.busword - 1)//region.busword
                 _type = "rw"
+                if isinstance(csr, MockCSR):
+                    _type = csr.type
                 if isinstance(csr, CSRStatus) and not hasattr(csr, "r"):
                     _type = "ro"
                 d["csr_registers"][name + "_" + csr.name] = {
